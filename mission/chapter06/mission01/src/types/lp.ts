@@ -30,3 +30,19 @@ export type LpListResponseDto = {
   nextCursor: number;
   hasNext: boolean;
 };
+
+export type CommentResponseDto = {
+  id: number;
+  content: string;
+  lpId: number;
+  authorId: number;
+  createdAt: string;
+  updatedAt: string;
+  author: ResponseSignupDto;
+};
+
+export type CommentListResponseDto = {
+  data: CommentResponseDto[];
+  nextCursor: number;
+  hasNext: boolean;
+};

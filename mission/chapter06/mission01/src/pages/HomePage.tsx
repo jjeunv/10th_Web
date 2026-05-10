@@ -1,33 +1,65 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getLps } from "../apis/lp";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import Spinner from "../components/common/Spinner";
 import ErrorMessage from "../components/common/ErrorMessage";
+import LpCardSkeleton from "../components/lp/LpCardSkeleton";
 
 const HomePage = () => {
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const navigate = useNavigate();
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const {
-    data: lpList,
+    data,
+    hasNextPage,
+    isFetchingNextPage,
     isPending,
     isError,
     error,
-  } = useQuery({
+    fetchNextPage,
+  } = useInfiniteQuery({
     queryKey: ["lps", order],
-    queryFn: () => getLps(undefined, undefined, undefined, order),
+    queryFn: ({ pageParam }) => getLps(pageParam, 10, undefined, order),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.nextCursor : undefined,
   });
 
-  if (isPending) return <Spinner />;
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && hasNextPage) {
+        fetchNextPage();
+      }
+    });
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, fetchNextPage]);
+
   if (isError) return <ErrorMessage message={error.message} />;
+
+  if (isPending) {
+    return (
+      <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <LpCardSkeleton key={i} />
+        ))}
+      </ul>
+    );
+  }
+
+  const lps = data.pages.flatMap((page) => page.data);
 
   return (
     <div>
       <div className="flex items-end justify-between mb-8 gap-4">
         <div>
           <p className="text-sm mt-1 text-neutral-400">
-            {lpList.data.length}개의 레코드
+            {lps.length}개의 레코드
           </p>
         </div>
         <button
@@ -38,21 +70,20 @@ const HomePage = () => {
         </button>
       </div>
 
-      {lpList.data.length === 0 ? (
+      {lps.length === 0 ? (
         <div className="text-center py-24 text-neutral-400">
           <p className="text-6xl mb-4">◉</p>
           <p className="text-sm">아직 등록된 LP가 없습니다</p>
         </div>
       ) : (
         <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {lpList.data.map((lp) => (
+          {lps.map((lp) => (
             <li
               key={lp.id}
               onClick={() => navigate(`/lps/${lp.id}`)}
               className="group cursor-pointer"
             >
               <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-neutral-100 transition-transform duration-300 group-hover:scale-[1.03]">
-                {/* 이미지 */}
                 {lp.thumbnail ? (
                   <img
                     src={lp.thumbnail}
@@ -64,11 +95,7 @@ const HomePage = () => {
                     ◉
                   </div>
                 )}
-
-                {/* 호버 오버레이 */}
                 <div className="absolute inset-0 bg-black/65 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                {/* 호버 메타 정보 */}
                 <div className="absolute inset-0 flex flex-col justify-end p-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                   <p className="text-sm font-semibold text-white truncate leading-snug">
                     {lp.title}
@@ -86,7 +113,15 @@ const HomePage = () => {
         </ul>
       )}
 
-      {/* 플로팅 버튼 */}
+      <div ref={sentinelRef} className="h-4" />
+      {isFetchingNextPage && (
+        <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <LpCardSkeleton key={i} />
+          ))}
+        </ul>
+      )}
+
       <button
         onClick={() => navigate("/lps/new")}
         className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-amber text-white text-2xl font-bold shadow-lg hover:bg-amber/90 active:scale-95 transition-all flex items-center justify-center"

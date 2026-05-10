@@ -4,6 +4,7 @@ import { getLp } from "../apis/lp";
 import { useAuth } from "../contexts/AuthContext";
 import Spinner from "../components/common/Spinner";
 import ErrorMessage from "../components/common/ErrorMessage";
+import LpComments from "../components/lp/LpComments";
 
 const HeartIcon = ({ filled }: { filled?: boolean }) => (
   <svg
@@ -78,7 +79,6 @@ const LpDetailPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* 뒤로가기 */}
       <button
         onClick={() => navigate(-1)}
         className="text-sm text-neutral-500 hover:text-neutral-900 transition mb-6 flex items-center gap-1"
@@ -87,7 +87,6 @@ const LpDetailPage = () => {
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-        {/* 썸네일 */}
         <div className="w-full aspect-square rounded-2xl overflow-hidden bg-neutral-100 shrink-0">
           {lp.thumbnail ? (
             <img
@@ -102,9 +101,7 @@ const LpDetailPage = () => {
           )}
         </div>
 
-        {/* 정보 영역 */}
         <div className="flex flex-col gap-5">
-          {/* 태그 */}
           {lp.tags.length > 0 && (
             <div className="flex gap-2 flex-wrap">
               {lp.tags.map((tag) => (
@@ -118,12 +115,10 @@ const LpDetailPage = () => {
             </div>
           )}
 
-          {/* 제목 */}
           <h1 className="font-display text-3xl md:text-4xl text-neutral-900 tracking-[0.03em] leading-tight">
             {lp.title}
           </h1>
 
-          {/* 업로드일 · 좋아요 수 */}
           <div className="flex items-center gap-4 text-sm border-b border-neutral-200 pb-5">
             <span className="text-neutral-500">
               {new Date(lp.createdAt).toLocaleDateString("ko-KR", {
@@ -135,12 +130,10 @@ const LpDetailPage = () => {
             <span className="text-amber font-medium">♥ {lp.likes.length}</span>
           </div>
 
-          {/* 본문 */}
           <p className="text-sm text-neutral-400 leading-relaxed flex-1">
             {lp.content}
           </p>
 
-          {/* 아티스트 */}
           <div className="flex items-center gap-3 pt-1 border-t border-neutral-200">
             <div className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center text-xs text-neutral-400">
               ◉
@@ -155,9 +148,7 @@ const LpDetailPage = () => {
             </div>
           </div>
 
-          {/* 액션 버튼 */}
           <div className="flex items-center gap-2 pt-1">
-            {/* 좋아요 */}
             <button
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition border ${
                 isLiked
@@ -169,7 +160,6 @@ const LpDetailPage = () => {
               {lp.likes.length}
             </button>
 
-            {/* 수정 · 삭제 - 본인만 노출 */}
             {isAuthor && (
               <>
                 <button className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-neutral-400 border border-neutral-200 hover:text-neutral-900 hover:bg-black/5 transition">
@@ -185,6 +175,8 @@ const LpDetailPage = () => {
           </div>
         </div>
       </div>
+
+      <LpComments lpId={Number(lpId)} />
     </div>
   );
 };
