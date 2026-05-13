@@ -1,9 +1,8 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { getLps } from "../apis/lp";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import ErrorMessage from "../components/common/ErrorMessage";
 import LpCardSkeleton from "../components/lp/LpCardSkeleton";
+import { useLps } from "../hooks/useLps";
 
 const HomePage = () => {
   const [order, setOrder] = useState<"asc" | "desc">("desc");
@@ -18,13 +17,7 @@ const HomePage = () => {
     isError,
     error,
     fetchNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["lps", order],
-    queryFn: ({ pageParam }) => getLps(pageParam, 10, undefined, order),
-    initialPageParam: undefined as number | undefined,
-    getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.nextCursor : undefined,
-  });
+  } = useLps(order);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
