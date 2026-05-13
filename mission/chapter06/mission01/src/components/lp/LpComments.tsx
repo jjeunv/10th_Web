@@ -1,7 +1,6 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
-import { getComments } from "../../apis/lp";
 import CommentSkeleton from "./CommentSkeleton";
+import { useLpComments } from "../../hooks/useLpComments";
 
 type Props = { lpId: number };
 
@@ -11,27 +10,21 @@ const LpComments = ({ lpId }: Props) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const { data, isPending, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useInfiniteQuery({
-      queryKey: ["lpComments", lpId, order],
-      queryFn: ({ pageParam }) => getComments(lpId, pageParam, 10, order),
-      initialPageParam: undefined as number | undefined,
-      getNextPageParam: (lastPage) =>
-        lastPage.hasNext ? lastPage.nextCursor : undefined,
-    });
+    useLpComments(lpId, order);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
 
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasNextPage) {
+      if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }
     });
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasNextPage, fetchNextPage]);
+  }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
 
   const comments = data?.pages.flatMap((page) => page.data) ?? [];
 
