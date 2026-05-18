@@ -87,3 +87,7 @@ export const deleteComment = async (
   );
   return response.data.data;
 };
+
+export const toggleLike = async (lpId: number): Promise<void> => {
+  await axiosInstance.post(`/v1/lps/${lpId}/likes`);
+};

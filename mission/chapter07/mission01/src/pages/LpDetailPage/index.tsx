@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLp } from "./hooks/useLp";
 import { useDeleteLp } from "./hooks/useDeleteLp";
+import { useToggleLike } from "./hooks/useToggleLike";
 import Spinner from "../../components/common/Spinner";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import LpComments from "./components/LpComments";
@@ -18,6 +19,7 @@ const LpDetailPage = () => {
 
   const { data: lp, isPending, isError, error } = useLp(Number(lpId));
   const { mutate: deleteMutate } = useDeleteLp(Number(lpId));
+  const { mutate: toggleLikeMutate } = useToggleLike(Number(lpId));
 
   if (isPending) return <Spinner />;
   if (isError) return <ErrorMessage message={error.message} />;
@@ -145,6 +147,7 @@ const LpDetailPage = () => {
 
           <div className="flex items-center gap-2 pt-1">
             <button
+              onClick={() => toggleLikeMutate()}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition border ${
                 isLiked
                   ? "text-amber border-amber/40 bg-amber/10"
