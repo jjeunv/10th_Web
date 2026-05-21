@@ -12,5 +12,8 @@ export const useDeleteLp = (lpId: number) => {
       queryClient.invalidateQueries({ queryKey: ["lps"] });
       navigate("/");
     },
+    onError: (error) => {
+      console.error("LP 삭제 실패:", error);
+    },
   });
 };
