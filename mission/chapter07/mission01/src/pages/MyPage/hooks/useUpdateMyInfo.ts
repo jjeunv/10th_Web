@@ -12,7 +12,9 @@ export const useUpdateMyInfo = (onSuccess?: () => void) => {
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey: ["myInfo"] });
 
-      const previousMyInfo = queryClient.getQueryData<ResponseSignupDto>(["myInfo"]);
+      const previousMyInfo = queryClient.getQueryData<ResponseSignupDto>([
+        "myInfo",
+      ]);
 
       queryClient.setQueryData<ResponseSignupDto>(["myInfo"], (old) => {
         if (!old) return old;
@@ -23,15 +25,20 @@ export const useUpdateMyInfo = (onSuccess?: () => void) => {
         };
       });
 
+      const previousName = previousMyInfo?.name;
+
       if (variables.name) {
         updateName(variables.name);
       }
 
-      return { previousMyInfo };
+      return { previousMyInfo, previousName };
     },
     onError: (_err, _variables, context) => {
       if (context?.previousMyInfo) {
         queryClient.setQueryData(["myInfo"], context.previousMyInfo);
+      }
+      if (context?.previousName !== undefined) {
+        updateName(context.previousName);
       }
     },
     onSettled: () => {
