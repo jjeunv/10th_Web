@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Modal from "../common/Modal";
-import { useCreateLp } from "../../hooks/useCreateLp";
-import { useUpdateLp } from "../../hooks/useUpdateLp";
+import { useLpMutation } from "../../hooks/useLpMutation";
 
 interface LpModalProps {
   onClose: () => void;
@@ -25,18 +24,10 @@ const LpModal = ({ onClose, lpId, initialData }: LpModalProps) => {
     };
   }, [thumbnailUrl]);
 
-  const { mutate: createMutate } = useCreateLp();
-  const { mutate: updateMutate } = useUpdateLp(lpId ?? 0, onClose);
+  const { mutate } = useLpMutation(lpId);
 
   const handleSubmit = () => {
-    if (isEditMode) {
-      updateMutate({ title, content, tags, published: true });
-    } else {
-      createMutate(
-        { title, content, tags, published: true },
-        { onSuccess: () => onClose() },
-      );
-    }
+    mutate({ title, content, tags, published: true }, { onSuccess: () => onClose() });
   };
 
   const handleAddTag = () => {
