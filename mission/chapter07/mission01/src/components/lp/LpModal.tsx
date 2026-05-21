@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "../common/Modal";
 import { useCreateLp } from "../../hooks/useCreateLp";
 import { useUpdateLp } from "../../hooks/useUpdateLp";
@@ -13,10 +13,17 @@ const LpModal = ({ onClose, lpId, initialData }: LpModalProps) => {
   const isEditMode = !!lpId && !!initialData;
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [title, setTitle] = useState<string>(initialData?.title ?? "");
   const [content, setContent] = useState<string>(initialData?.content ?? "");
   const [tags, setTags] = useState<string[]>(initialData?.tags ?? []);
   const [tagInput, setTagInput] = useState<string>("");
+
+  useEffect(() => {
+    return () => {
+      if (thumbnailUrl) URL.revokeObjectURL(thumbnailUrl);
+    };
+  }, [thumbnailUrl]);
 
   const { mutate: createMutate } = useCreateLp();
   const { mutate: updateMutate } = useUpdateLp(lpId ?? 0, onClose);
@@ -62,7 +69,7 @@ const LpModal = ({ onClose, lpId, initialData }: LpModalProps) => {
           <div className="mb-5 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-neutral-200 bg-neutral-50 p-6 gap-2">
             {thumbnail ? (
               <img
-                src={URL.createObjectURL(thumbnail)}
+                src={thumbnailUrl ?? undefined}
                 alt="미리보기"
                 className="h-32 w-32 rounded-full object-cover"
               />
@@ -77,7 +84,11 @@ const LpModal = ({ onClose, lpId, initialData }: LpModalProps) => {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={(e) => setThumbnail(e.target.files?.[0] ?? null)}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  setThumbnail(file);
+                  setThumbnailUrl(file ? URL.createObjectURL(file) : null);
+                }}
               />
             </label>
           </div>
