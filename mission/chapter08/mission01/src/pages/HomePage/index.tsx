@@ -2,19 +2,25 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import LpCardSkeleton from "./components/LpCardSkeleton";
-import { useLps } from "./hooks/useLps";
+import { useLps, useSearchLps } from "./hooks/useLps";
 import LpModal from "../../components/lp/LpModal";
 import { useAuth } from "../../contexts/AuthContext";
 import LoginRequiredModal from "../../components/common/LoginRequiredModal";
+import { useDebounce } from "../../hooks/useDebounce";
+import { SearchIcon } from "../../components/icons";
 
 const HomePage = () => {
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const debounceSearch = useDebounce(search, 300);
 
+  const allLps = useLps(order); // 전체 목록
+  const searchLps = useSearchLps(order, debounceSearch); // 검색어 있을 경우 검색 결과
   const {
     data,
     hasNextPage,
@@ -23,7 +29,7 @@ const HomePage = () => {
     isError,
     error,
     fetchNextPage,
-  } = useLps(order);
+  } = debounceSearch.trim() ? searchLps : allLps;
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -41,26 +47,39 @@ const HomePage = () => {
 
   if (isError) return <ErrorMessage message={error.message} />;
 
-  if (isPending) {
-    return (
-      <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <LpCardSkeleton key={i} />
-        ))}
-      </ul>
-    );
-  }
-
-  const lps = data.pages.flatMap((page) => page.data);
+  const lps = data?.pages.flatMap((page) => page.data) ?? [];
 
   return (
     <div>
+      <div className="relative mb-6">
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none">
+          <SearchIcon />
+        </span>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="검색어를 입력하세요"
+          className="w-full pl-10 pr-10 py-2.5 rounded-full border border-neutral-200 bg-neutral-50 text-sm focus:outline-none focus:border-amber focus:bg-white transition"
+        />
+        {search && (
+          <button
+            onClick={() => setSearch("")}
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-neutral-300 hover:bg-neutral-400 transition flex items-center justify-center text-white text-xs leading-none"
+            aria-label="검색어 지우기"
+          >
+            ×
+          </button>
+        )}
+      </div>
+
       <div className="flex items-end justify-between mb-8 gap-4">
         <div>
           <p className="text-sm mt-1 text-neutral-400">
             {lps.length}개의 레코드
           </p>
         </div>
+
         <button
           onClick={() => setOrder(order === "desc" ? "asc" : "desc")}
           className="shrink-0 flex items-center gap-2 text-xs px-4 py-2 rounded-full text-amber border border-amber/30 transition hover:bg-amber/10 hover:border-amber/50 active:scale-[0.98]"
@@ -69,7 +88,13 @@ const HomePage = () => {
         </button>
       </div>
 
-      {lps.length === 0 ? (
+      {isPending ? (
+        <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <LpCardSkeleton key={i} />
+          ))}
+        </ul>
+      ) : lps.length === 0 ? (
         <div className="text-center py-24 text-neutral-400">
           <p className="text-6xl mb-4">◉</p>
           <p className="text-sm">아직 등록된 LP가 없습니다</p>
