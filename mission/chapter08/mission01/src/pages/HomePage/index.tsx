@@ -8,16 +8,20 @@ import { useAuth } from "../../contexts/AuthContext";
 import LoginRequiredModal from "../../components/common/LoginRequiredModal";
 import { useDebounce } from "../../hooks/useDebounce";
 import { SearchIcon } from "../../components/icons";
+import { useThrottle } from "../../hooks/useThrottle";
 
 const HomePage = () => {
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
   const [search, setSearch] = useState("");
+  const [intersectCount, setIntersectCount] = useState(0); // 바닥에 닿은 횟수를 state로 추적
+
   const navigate = useNavigate();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
   const debounceSearch = useDebounce(search, 300);
+  const throttledCount = useThrottle(intersectCount, 1000);
 
   const allLps = useLps(order); // 전체 목록
   const searchLps = useSearchLps(order, debounceSearch); // 검색어 있을 경우 검색 결과
@@ -31,19 +35,25 @@ const HomePage = () => {
     fetchNextPage,
   } = debounceSearch.trim() ? searchLps : allLps;
 
+  // throttledCount가 바뀔 때만 fetchNextPage 실행
+  useEffect(() => {
+    if (throttledCount > 0 && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [throttledCount, hasNextPage, fetchNextPage]);
+
+  // IntersectionObserver는 카운트만 올리기
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
-
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasNextPage) {
-        fetchNextPage();
+      if (entries[0].isIntersecting) {
+        setIntersectCount((c) => c + 1); // 바닥 닿을 때마다 +1
       }
     });
-
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasNextPage, fetchNextPage]);
+  }, []);
 
   if (isError) return <ErrorMessage message={error.message} />;
 
