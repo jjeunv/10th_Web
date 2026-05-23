@@ -5,6 +5,7 @@ import { useLogout } from "../../hooks/useLogout";
 import { useDeleteAccount } from "../../hooks/useDeleteAccount";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import { useSidebar } from "../../hooks/useSidebar";
 
 const SIDEBAR_W = 160;
 
@@ -12,9 +13,9 @@ const Layout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const { isOpen: sidebarOpen, toggle, close } = useSidebar();
   const { mutate: logoutMutate } = useLogout();
   const { mutate: deleteAccountMutate } = useDeleteAccount();
 
@@ -74,7 +75,7 @@ const Layout = () => {
         <div
           className="fixed inset-0 z-30 md:bg-transparent bg-black/30"
           style={{ left: SIDEBAR_W }}
-          onClick={() => setSidebarOpen(false)}
+          onClick={close}
         />
       )}
 
@@ -84,7 +85,7 @@ const Layout = () => {
       >
         <Header
           user={user}
-          onToggleSidebar={() => setSidebarOpen((v) => !v)}
+          onToggleSidebar={toggle}
           onLogout={() => logoutMutate()}
           onNavigate={navigate}
         />
