@@ -2,11 +2,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import { AuthProvider } from "./contexts/AuthContext";
-import Layout from "./components/layout/Layout";
+import { AuthProvider } from "./features/auth/contexts/AuthContext";
+import Layout from "./shared/layouts/Layout";
 import HomePage from "./pages/HomePage";
 import LpDetailPage from "./pages/LpDetailPage";
-import ProtectRoute from "./components/common/ProtectRoute";
+import ProtectRoute from "./features/auth/components/ProtectRoute";
 import MyPage from "./pages/MyPage";
 
 const queryClient = new QueryClient({
