@@ -7,17 +7,14 @@ export const useThrottle = <T>(value: T, interval: number): T => {
   useEffect(() => {
     const now = Date.now();
     const remaining = interval - (now - lastRun.current);
+    const delay = remaining <= 0 ? 0 : remaining;
 
-    if (remaining <= 0) {
-      lastRun.current = now;
+    const timer = setTimeout(() => {
+      lastRun.current = Date.now();
       setThrottledValue(value);
-    } else {
-      const timer = setTimeout(() => {
-        lastRun.current = Date.now();
-        setThrottledValue(value);
-      }, remaining);
-      return () => clearTimeout(timer);
-    }
+    }, delay);
+
+    return () => clearTimeout(timer);
   }, [value, interval]);
 
   return throttledValue;
