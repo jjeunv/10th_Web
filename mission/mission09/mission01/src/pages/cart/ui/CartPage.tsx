@@ -1,7 +1,10 @@
+import useModal from "../../../features/modal/model/useModal";
+import Modal from "../../../features/modal/ui/Modal";
 import CartList from "../../../widgets/cart-list/ui/CartList";
 import CartSummary from "../../../widgets/cart-summary/ui/CartSummary";
 
 const CartPage = () => {
+  const { isOpen } = useModal();
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-gray-900 text-white px-6 py-4">
@@ -11,6 +14,7 @@ const CartPage = () => {
         <CartList />
         <CartSummary />
       </main>
+      {isOpen && <Modal />}
     </div>
   );
 };
