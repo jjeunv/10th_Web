@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useTaskContext } from "../contexts/TaskContext";
 import type { Task } from "../types/task";
 
@@ -5,7 +6,7 @@ interface TaskItemProps {
   task: Task;
 }
 
-export const TaskItem = ({ task }: TaskItemProps) => {
+export const TaskItem = memo(({ task }: TaskItemProps) => {
   const { toggleTask, deleteTask } = useTaskContext();
 
   return (
@@ -31,4 +32,4 @@ export const TaskItem = ({ task }: TaskItemProps) => {
       </button>
     </li>
   );
-};
+});

@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 
 interface TaskInputProps {
   onAdd: (text: string) => void;
 }
 
-export const TaskInput = ({ onAdd }: TaskInputProps) => {
+export const TaskInput = memo(({ onAdd }: TaskInputProps) => {
   const [task, setTask] = useState("");
 
   const handleClick = () => {
@@ -33,4 +33,4 @@ export const TaskInput = ({ onAdd }: TaskInputProps) => {
       </button>
     </div>
   );
-};
+});
