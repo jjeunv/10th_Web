@@ -1,0 +1,25 @@
+import type { Product } from "./types";
+
+export const products: Product[] = [
+  { id: 1, name: "노트북", category: "전자제품", price: 1200000 },
+  { id: 2, name: "스마트폰", category: "전자제품", price: 950000 },
+  { id: 3, name: "무선이어폰", category: "전자제품", price: 180000 },
+  { id: 4, name: "태블릿", category: "전자제품", price: 650000 },
+  { id: 5, name: "스마트워치", category: "전자제품", price: 320000 },
+  { id: 6, name: "블루투스스피커", category: "전자제품", price: 89000 },
+  { id: 7, name: "게이밍키보드", category: "전자제품", price: 145000 },
+  { id: 8, name: "사과", category: "식품", price: 5000 },
+  { id: 9, name: "바나나", category: "식품", price: 3000 },
+  { id: 10, name: "우유", category: "식품", price: 2800 },
+  { id: 11, name: "콜드브루", category: "식품", price: 4500 },
+  { id: 12, name: "그릭요거트", category: "식품", price: 6000 },
+  { id: 13, name: "통밀빵", category: "식품", price: 4000 },
+  { id: 14, name: "다크초콜릿", category: "식품", price: 7500 },
+  { id: 15, name: "청바지", category: "의류", price: 59000 },
+  { id: 16, name: "후드티", category: "의류", price: 45000 },
+  { id: 17, name: "운동화", category: "의류", price: 89000 },
+  { id: 18, name: "트렌치코트", category: "의류", price: 159000 },
+  { id: 19, name: "니트스웨터", category: "의류", price: 49000 },
+  { id: 20, name: "반팔티셔츠", category: "의류", price: 19000 },
+  { id: 21, name: "레인부츠", category: "의류", price: 65000 },
+];
