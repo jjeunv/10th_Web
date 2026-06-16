@@ -1,0 +1,107 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 36px;
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 10px 10px 10px 20px;
+  transition: border-color 0.2s;
+}
+
+.form:focus-within {
+  border-color: var(--border-mint);
+  box-shadow: var(--shadow-glow);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text);
+  outline: none;
+  letter-spacing: 0.1px;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-strong);
+  flex-shrink: 0;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--text-sub);
+  white-space: nowrap;
+  user-select: none;
+  padding: 0 4px;
+}
+
+.checkbox {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--mint);
+  cursor: pointer;
+}
+
+.select {
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  color: var(--text-sub);
+  outline: none;
+  cursor: pointer;
+  padding: 4px 2px;
+}
+
+.select option {
+  background: var(--surface-overlay);
+  color: var(--text);
+}
+
+.button {
+  padding: 10px 22px;
+  background: var(--mint);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition:
+    background 0.15s,
+    box-shadow 0.15s;
+  flex-shrink: 0;
+}
+
+.button:hover {
+  background: var(--mint-bright);
+  box-shadow: var(--shadow-glow);
+}
+
+.errorMessage {
+  font-size: 12px;
+  color: #e53e3e;
+  padding-left: 4px;
+}
