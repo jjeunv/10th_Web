@@ -1,4 +1,4 @@
-import { skipToken, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, skipToken, useQuery } from "@tanstack/react-query";
 import { fetchMovies } from "@/shared/api";
 import type { FormValues } from "@/shared/model";
 import type { Movie } from "@/entities/movie";
@@ -14,6 +14,7 @@ const useMovieSearch = (searchParams: FormValues | null) => {
             searchParams.language,
           )
       : skipToken, // enabled 옵션 대신 사용
+    placeholderData: keepPreviousData,
   });
 
   return query;
